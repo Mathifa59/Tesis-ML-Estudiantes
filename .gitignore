@@ -1,0 +1,41 @@
+# ── Python ───────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.venv/
+venv/
+env/
+ENV/
+
+# ── Jupyter ──────────────────────────────────────────────────────────────────
+.ipynb_checkpoints/
+
+# ── Modelos y artefactos generados ───────────────────────────────────────────
+# Los .pkl se regeneran corriendo `python train_model.py`
+*.pkl
+*.joblib
+
+# ── Streamlit ────────────────────────────────────────────────────────────────
+.streamlit/secrets.toml
+
+# ── Gráficos generados por el notebook ───────────────────────────────────────
+grafico_*.png
+
+# ── Entornos e IDE ───────────────────────────────────────────────────────────
+.vscode/
+.idea/
+.claude/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# ── Archivos temporales ──────────────────────────────────────────────────────
+*.log
+*.tmp
+*.bak
