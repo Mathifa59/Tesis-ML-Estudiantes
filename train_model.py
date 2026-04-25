@@ -27,8 +27,10 @@ from sklearn.metrics import (
     roc_auc_score,
     roc_curve,
 )
-from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import cross_val_score, train_test_split
 from sklearn.preprocessing import LabelEncoder
+from sklearn.tree import DecisionTreeClassifier
 from imblearn.over_sampling import SMOTE
 
 
@@ -75,14 +77,30 @@ def main() -> None:
     X_train_sm, y_train_sm = smote.fit_resample(X_train, y_train)
     print(f"  Train original: {X_train.shape[0]} | Train SMOTE: {X_train_sm.shape[0]}")
 
-    print("Entrenando Random Forest...")
-    model = RandomForestClassifier(
-        n_estimators=200,
-        max_depth=8,
-        min_samples_split=5,
-        random_state=SEED,
-        n_jobs=-1,
-    )
+    # --- Comparativa de modelos ---
+    candidatos = {
+        "Random Forest   ": RandomForestClassifier(
+            n_estimators=200, max_depth=8, min_samples_split=5,
+            random_state=SEED, n_jobs=-1,
+        ),
+        "Logistic Regr.  ": LogisticRegression(max_iter=1000, random_state=SEED),
+        "Decision Tree   ": DecisionTreeClassifier(random_state=SEED),
+    }
+
+    print()
+    print("=" * 65)
+    print("  COMPARATIVA DE MODELOS (validación cruzada 5-fold sobre train+SMOTE)")
+    print("=" * 65)
+    print(f"  {'Modelo':<20} {'CV F1 mean':>10} {'CV F1 std':>10}")
+    print("  " + "-" * 42)
+    for nombre, clf in candidatos.items():
+        cv_scores = cross_val_score(clf, X_train_sm, y_train_sm, cv=5, scoring="f1", n_jobs=-1)
+        print(f"  {nombre:<20} {cv_scores.mean():.4f}     ±{cv_scores.std():.4f}")
+    print()
+
+    # --- Entrenamiento final con Random Forest ---
+    print("Entrenando modelo final: Random Forest...")
+    model = candidatos["Random Forest   "]
     model.fit(X_train_sm, y_train_sm)
 
     y_pred = model.predict(X_test)
@@ -96,15 +114,18 @@ def main() -> None:
     cm = confusion_matrix(y_test, y_pred)
     fpr, tpr, _ = roc_curve(y_test, y_prob)
 
+    cv_rf = cross_val_score(model, X_train_sm, y_train_sm, cv=5, scoring="f1", n_jobs=-1)
+
     print()
     print("=" * 55)
-    print("  REPORTE FINAL - RANDOM FOREST")
+    print("  REPORTE FINAL - RANDOM FOREST (conjunto de prueba)")
     print("=" * 55)
     print(f"  Accuracy : {acc:.4f}")
     print(f"  Precision: {prec:.4f}")
     print(f"  Recall   : {rec:.4f}")
     print(f"  F1-score : {f1:.4f}")
     print(f"  AUC-ROC  : {auc:.4f}")
+    print(f"  CV F1 (5-fold): {cv_rf.mean():.4f} ± {cv_rf.std():.4f}")
     print()
 
     metrics = {
@@ -118,6 +139,8 @@ def main() -> None:
         "roc_tpr": tpr.tolist(),
         "features": FEATURES,
         "feature_importances": model.feature_importances_.tolist(),
+        "cv_f1_mean": float(cv_rf.mean()),
+        "cv_f1_std": float(cv_rf.std()),
         "trained_at": pd.Timestamp.now().isoformat(timespec="seconds"),
     }
 
