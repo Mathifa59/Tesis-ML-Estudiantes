@@ -18,10 +18,10 @@ import streamlit as st
 
 # ── Constants ────────────────────────────────────────────────────────────────
 
-DATASET_PATH = "dataset_estudiantes.csv"
-MODEL_PATH   = "modelo_rf.pkl"
-ENCODER_PATH = "label_encoder.pkl"
-METRICS_PATH = "metricas_modelo.pkl"
+DATASET_PATH = "data/dataset_estudiantes.csv"
+MODEL_PATH   = "model/modelo_rf.pkl"
+ENCODER_PATH = "model/label_encoder.pkl"
+METRICS_PATH = "model/metricas_modelo.pkl"
 
 FEATURES = [
     "promedio_notas", "nota_matematica", "nota_comunicacion",
