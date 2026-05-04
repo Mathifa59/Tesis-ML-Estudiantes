@@ -98,9 +98,25 @@ header    { visibility: hidden; }
     max-width: 1400px;
 }
 
-/* ── Sidebar ── */
+/* ── Sidebar SIEMPRE visible (no se puede colapsar) ── */
 [data-testid="stSidebar"] {
     background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%) !important;
+    min-width: 280px !important;
+    max-width: 280px !important;
+    width: 280px !important;
+    transform: none !important;
+    visibility: visible !important;
+    margin-left: 0 !important;
+    left: 0 !important;
+    display: block !important;
+}
+[data-testid="stSidebarCollapseButton"],
+[data-testid="stSidebarCollapsedControl"],
+[data-testid="collapsedControl"] {
+    display: none !important;
+    visibility: hidden !important;
+    width: 0 !important;
+    height: 0 !important;
 }
 [data-testid="stSidebar"] p,
 [data-testid="stSidebar"] span,
